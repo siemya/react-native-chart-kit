@@ -178,16 +178,9 @@ class LineChart extends AbstractChart {
       .join(' ');
   };
 
-  renderTooltipElement(config) {
-    const {value, valueIcon, rate, rateIcon, date} = this.props.tooltip;
-    const {
-      data,
-      width,
-      height,
-      paddingTop,
-      paddingRight,
-      onDataPointClick,
-    } = config;
+   renderTooltipElement(config) {
+    const {value} = this.props.dotConfig;
+    const {data, width, height, paddingTop, paddingRight} = config;
     const output = [];
     const datas = this.getDatas(data);
     const baseHeight = this.calcBaseHeight(datas, height);
@@ -203,65 +196,10 @@ class LineChart extends AbstractChart {
             <View
               key={i}
               style={{
-                marginTop: cy - 100,
-                marginLeft: cx - 83,
+                marginTop: cy,
+                marginLeft: cx,
               }}>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  backgroundColor: 'white',
-                  borderRadius: 8,
-                  width: 166,
-                  height: 82,
-                  elevation: 10,
-                  paddingHorizontal: 20,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    marginBottom: 7,
-                  }}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Text style={{color: '#8992A3'}}>$</Text>
-                    <Text>0.082</Text>
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        backgroundColor: 'rgba(246, 57, 45, 0.04)',
-                        borderRadius: 4,
-                      }}>
-                      2.35%
-                    </Text>
-                  </View>
-                </View>
-                <View>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      lineHeight: 16,
-                      color: '#2E3D5C',
-                      opacity: 0.4,
-                      textAlign: 'center',
-                    }}>
-                    18.06.2019 at 8:35 pm
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    width: 20,
-                    height: 20,
-                    position: 'absolute',
-                    bottom: -10,
-                    left: 73,
-                    borderRadius: 3,
-                    zIndex: 2,
-                    backgroundColor: 'white',
-                    transform: [{rotate: '45deg'}],
-                  }}
-                />
-              </View>
+              {this.props.tooltip}
             </View>,
           );
         else null;
