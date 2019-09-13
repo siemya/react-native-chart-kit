@@ -53,8 +53,8 @@ class LineChart extends AbstractChart {
             key={Math.random()}
             cx={cx}
             cy={cy}
-            strokeWidth="5"
-            r={x === value ? '10' : '10'}
+            strokeWidth="3"
+            r={x === value ? '7' : '10'}
             stroke={x === value ? strokeColor : 'transparent'}
             fill={x === value ? fillColor : 'transparent'}
             onPress={onPress}
