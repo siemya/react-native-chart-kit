@@ -16,7 +16,7 @@ class LineChart extends AbstractChart {
     data.reduce((acc, item) => (item.data ? [...acc, ...item.data] : acc), []);
 
   renderDots = config => {
-    const {fillColor, strokeColor, value} = this.props.dotConfig;
+    const {fillColor, strokeColor, clickedPoint} = this.props.dotConfig;
     const {
       data,
       width,
@@ -24,6 +24,7 @@ class LineChart extends AbstractChart {
       paddingTop,
       paddingRight,
       onDataPointClick,
+      labels,
     } = config;
     const output = [];
     const datas = this.getDatas(data);
@@ -42,9 +43,10 @@ class LineChart extends AbstractChart {
 
           onDataPointClick({
             index: i,
-            value: x,
+            value: x.toString(),
             dataset,
             getColor: opacity => this.getColor(dataset, opacity),
+            label: labels[i],
           });
         };
 
@@ -54,9 +56,17 @@ class LineChart extends AbstractChart {
             cx={cx}
             cy={cy}
             strokeWidth="3"
-            r={x === value ? '7' : '10'}
-            stroke={x === value ? strokeColor : 'transparent'}
-            fill={x === value ? fillColor : 'transparent'}
+            r={x.toString() + labels[i] === clickedPoint ? '7' : '10'}
+            stroke={
+              x.toString() + labels[i] === clickedPoint
+                ? strokeColor
+                : 'transparent'
+            }
+            fill={
+              x.toString() + labels[i] === clickedPoint
+                ? fillColor
+                : 'transparent'
+            }
             onPress={onPress}
           />,
           // <Circle
@@ -178,9 +188,9 @@ class LineChart extends AbstractChart {
       .join(' ');
   };
 
-   renderTooltipElement(config) {
-    const {value} = this.props.dotConfig;
-    const {data, width, height, paddingTop, paddingRight} = config;
+  renderTooltipElement(config) {
+    const {clickedPoint} = this.props.dotConfig;
+    const {data, width, height, paddingTop, paddingRight, labels} = config;
     const output = [];
     const datas = this.getDatas(data);
     const baseHeight = this.calcBaseHeight(datas, height);
@@ -191,7 +201,7 @@ class LineChart extends AbstractChart {
         const cy =
           ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
           paddingTop;
-        if (x === value)
+        if (x.toString() + labels[i] === clickedPoint)
           output.push(
             <View
               key={i}
@@ -286,22 +296,7 @@ class LineChart extends AbstractChart {
               ry={borderRadius}
               fill="url(#backgroundGradient)"
             />
-            <G>
-              {withInnerLines
-                ? this.renderHorizontalLines({
-                    ...config,
-                    count: 4,
-                    paddingTop,
-                    paddingRight,
-                  })
-                : withOuterLines
-                ? this.renderHorizontalLine({
-                    ...config,
-                    paddingTop,
-                    paddingRight,
-                  })
-                : null}
-            </G>
+
             <G>
               {withHorizontalLabels
                 ? this.renderHorizontalLabels({
@@ -361,6 +356,7 @@ class LineChart extends AbstractChart {
                 this.renderDots({
                   ...config,
                   data: data.datasets,
+                  labels: labels,
                   paddingTop,
                   paddingRight,
                   onDataPointClick,
@@ -375,11 +371,12 @@ class LineChart extends AbstractChart {
                   paddingRight,
                 })}
             </G>
-            {this.props.dotConfig.value && (
+            {this.props.dotConfig.clickedPoint && (
               <G>
                 {this.renderTooltipElement({
                   ...config,
                   data: data.datasets,
+                  labels: labels,
                   paddingTop,
                   paddingRight,
                 })}
