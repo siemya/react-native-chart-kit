@@ -41,16 +41,17 @@ class AbstractChart extends Component {
 
   renderHorizontalLines = config => {
     const {count, width, height, paddingTop, paddingRight} = config;
+    const {innerLineColor} = this.props.chartConfig;
     return [...new Array(count)].map((_, i) => {
       return (
         <Line
           key={Math.random()}
-          x1={paddingRight}
+          x1={64}
           y1={(height / 4) * i + paddingTop}
           x2={width}
           y2={(height / 4) * i + paddingTop}
-          stroke={this.props.chartConfig.lineColor}
-          strokeDasharray={i === count - 1 ? '' : '5, 10'}
+          stroke={innerLineColor}
+          strokeDasharray={i === count - 1 ? '' : '3, 5'}
           strokeWidth={1}
         />
       );
@@ -67,7 +68,7 @@ class AbstractChart extends Component {
         x2={width}
         y2={height - height / 4 + paddingTop}
         stroke={this.props.chartConfig.color(0.2)}
-        strokeDasharray="5, 10"
+        strokeDasharray="5, 7"
         strokeWidth={1}
       />
     );
@@ -82,6 +83,7 @@ class AbstractChart extends Component {
       paddingRight,
       yLabelsOffset = 12,
     } = config;
+    const {horizontalLabelColor} = this.props.chartConfig;
     const decimalPlaces =
       this.props.chartConfig.decimalPlaces === undefined
         ? 2
@@ -103,11 +105,11 @@ class AbstractChart extends Component {
       return (
         <Text
           key={Math.random()}
-          x={paddingRight - yLabelsOffset}
+          x={64 - yLabelsOffset}
           textAnchor="end"
           y={(height * 3) / 4 - ((height - paddingTop) / count) * i + 12}
           fontSize={12}
-          fill={this.props.chartConfig.labelColor}>
+          fill={horizontalLabelColor}>
           {yLabel}
         </Text>
       );
@@ -151,24 +153,27 @@ class AbstractChart extends Component {
   };
 
   renderVerticalLines = config => {
-    const {data, width, height, paddingTop, paddingRight} = config;
-    return [...new Array(data.length)].map((_, i) => {
-      return (
-        <Line
-          key={Math.random()}
-          x1={Math.floor(
-            ((width - paddingRight) / data.length) * i + paddingRight,
-          )}
-          y1={0}
-          x2={Math.floor(
-            ((width - paddingRight) / data.length) * i + paddingRight,
-          )}
-          y2={height - height / 4 + paddingTop}
-          stroke={this.props.chartConfig.color(0.2)}
-          strokeDasharray="5, 10"
-          strokeWidth={1}
-        />
-      );
+    const {data, width, height, paddingTop, paddingRight, labels} = config;
+    const {innerLineColor} = this.props.chartConfig;
+    const {clickedPoint} = this.props;
+    return data.map((_, i) => {
+      if (_.toString() + '+' + labels[i] === clickedPoint) {
+        return (
+          <Line
+            key={Math.random()}
+            x1={Math.floor(
+              ((width - paddingRight) / (data.length - 1)) * i + paddingRight,
+            )}
+            y1={15}
+            x2={Math.floor(
+              ((width - paddingRight) / (data.length - 1)) * i + paddingRight,
+            )}
+            y2={height - height / 4 + paddingTop}
+            stroke={innerLineColor}
+            strokeWidth={1}
+          />
+        );
+      } else return null;
     });
   };
 
@@ -181,7 +186,7 @@ class AbstractChart extends Component {
         y1={0}
         x2={Math.floor(paddingRight)}
         y2={height - height / 4 + paddingTop}
-        stroke={this.props.chartConfig.color(0.2)}
+        stroke={black}
         strokeDasharray="5, 10"
         strokeWidth={1}
       />
@@ -199,7 +204,7 @@ class AbstractChart extends Component {
       <Defs>
         <LinearGradient
           id="backgroundGradient"
-          x1="100"
+          x1="0"
           y1={height}
           x2={width}
           y2={0}>
