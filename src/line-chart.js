@@ -16,7 +16,7 @@ class LineChart extends AbstractChart {
     data.reduce((acc, item) => (item.data ? [...acc, ...item.data] : acc), []);
 
   renderTooltipElement(config) {
-    const {clickedPoint} = this.props;
+    const {clickedPoint, dotR} = this.props;
     const {data, width, height, paddingTop, paddingRight, labels} = config;
     const output = [];
     const datas = this.getDatas(data);
@@ -24,11 +24,17 @@ class LineChart extends AbstractChart {
     data.map((dataset, index) => {
       dataset.data.map((x, i) => {
         const cx =
-          paddingRight + (i * (width - paddingRight)) / dataset.data.length - 1;
+          i === 0
+            ? paddingRight +
+              (i * (width - paddingRight)) / (dataset.data.length - 1)
+            : i === dataset.data.length - 1
+            ? paddingRight +
+              (i * (width - paddingRight)) / (dataset.data.length - 1)
+            : paddingRight +
+              (i * (width - paddingRight)) / (dataset.data.length - 1);
         const cy =
           ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
-          paddingTop -
-          1;
+          paddingTop;
         if (x.toString() + '+' + labels[i] === clickedPoint)
           output.push(
             <View
