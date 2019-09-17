@@ -254,22 +254,23 @@ class LineChart extends AbstractChart {
   renderBezierShadow = config => {
     const {width, height, paddingRight, paddingTop, data} = config;
     const output = [];
-    data.map((dataset, index) => {
-      const d =
-        this.getBezierLinePoints(dataset, config) +
-        ` L${paddingRight +
-          ((width - paddingRight) / dataset.data.length) *
-            dataset.data.length},${(height / 4) * 3 +
-          paddingTop} L${paddingRight},${(height / 4) * 3 + paddingTop} Z`;
-      output.push(
-        <Path
-          key={index}
-          d={d}
-          fill="url(#fillShadowGradient)"
-          strokeWidth={0}
-        />,
-      );
-    });
+    data[0].data.length !== 0 &&
+      data.map((dataset, index) => {
+        const d =
+          this.getBezierLinePoints(dataset, config) +
+          ` L${paddingRight +
+            ((width - paddingRight) / dataset.data.length) *
+              dataset.data.length},${(height / 4) * 3 +
+            paddingTop} L${paddingRight},${(height / 4) * 3 + paddingTop} Z`;
+        output.push(
+          <Path
+            key={index}
+            d={d}
+            fill="url(#fillShadowGradient)"
+            strokeWidth={0}
+          />,
+        );
+      });
     return output;
   };
 
