@@ -89,10 +89,8 @@ class AbstractChart extends Component {
         ? 2
         : this.props.chartConfig.decimalPlaces;
     const yAxisLabel = this.props.yAxisLabel || '';
-
     return [...new Array(count)].map((_, i) => {
       let yLabel;
-
       if (count === 1) {
         yLabel = `${yAxisLabel}${data[0].toFixed(decimalPlaces)}`;
       } else {
@@ -101,7 +99,7 @@ class AbstractChart extends Component {
           : (this.calcScaler(data) / (count - 1)) * i + Math.min(...data);
         yLabel = `${yAxisLabel}${label.toFixed(decimalPlaces)}`;
       }
-
+      yLabel = yLabel === 'NaN' ? 0 : yLabel;
       return (
         <Text
           key={Math.random()}
