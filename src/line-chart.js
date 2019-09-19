@@ -1,23 +1,27 @@
-import React from 'react';
-import {View} from 'react-native';
-import {Svg, Circle, Polygon, Polyline, Path, Rect, G} from 'react-native-svg';
-import AbstractChart from './abstract-chart';
-
+import React from "react";
+import { View } from "react-native";
+import {
+  Svg,
+  Circle,
+  Polygon,
+  Polyline,
+  Path,
+  Rect,
+  G
+} from "react-native-svg";
+import AbstractChart from "./abstract-chart";
 class LineChart extends AbstractChart {
   getColor = (dataset, opacity) => {
     return (dataset.color || this.props.chartConfig.color)(opacity);
   };
-
   getStrokeWidth = dataset => {
     return dataset.strokeWidth || this.props.chartConfig.strokeWidth || 3;
   };
-
   getDatas = data =>
     data.reduce((acc, item) => (item.data ? [...acc, ...item.data] : acc), []);
-
   renderTooltipElement(config) {
-    const {clickedPoint, dotR} = this.props;
-    const {data, width, height, paddingTop, paddingRight, labels} = config;
+    const { clickedPoint, dotR } = this.props;
+    const { data, width, height, paddingTop, paddingRight, labels } = config;
     const output = [];
     const datas = this.getDatas(data);
     const baseHeight = this.calcBaseHeight(datas, height);
@@ -35,23 +39,23 @@ class LineChart extends AbstractChart {
         const cy =
           ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
           paddingTop;
-        if (x.toString() + '+' + labels[i] === clickedPoint)
+        if (x.toString() + "+" + labels[i] === clickedPoint)
           output.push(
             <View
               key={i}
               style={{
                 marginTop: cy,
-                marginLeft: cx,
-              }}>
+                marginLeft: dataset.data.length - 1 === i ? cx - 3 : cx
+              }}
+            >
               {this.props.tooltip}
-            </View>,
+            </View>
           );
         else null;
       });
     });
     return output;
   }
-
   renderDots = config => {
     const {
       data,
@@ -60,16 +64,20 @@ class LineChart extends AbstractChart {
       paddingTop,
       paddingRight,
       onDataPointClick,
-      labels,
+      labels
     } = config;
-    const {dotFillColor, dotStrokeWidth, dotR} = this.props.chartConfig;
-    const {clickedPoint} = this.props;
+    const { dotFillColor, dotStrokeWidth, dotR } = this.props.chartConfig;
+    const { clickedPoint } = this.props;
     const output = [];
     const datas = this.getDatas(data);
     const baseHeight = this.calcBaseHeight(datas, height);
-
     data.map((dataset, index) => {
       dataset.data.map((x, i) => {
+        const cyPosFirst =
+          dataset.data.length !== 0 && x < dataset.data[i + 1]
+            ? 0 - dotR / 2
+            : dotR;
+        const cyPosLast = -dotR / 2;
         const cx =
           i === 0
             ? paddingRight +
@@ -77,29 +85,35 @@ class LineChart extends AbstractChart {
               (i * (width - paddingRight)) / (dataset.data.length - 1)
             : i === dataset.data.length - 1
             ? paddingRight -
-              dotR +
+              dotR / 2 +
               (i * (width - paddingRight)) / (dataset.data.length - 1)
             : paddingRight +
               (i * (width - paddingRight)) / (dataset.data.length - 1);
         const cy =
-          ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
-          paddingTop;
+          i === 0
+            ? ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
+              paddingTop +
+              cyPosFirst
+            : i === dataset.data.length - 1
+            ? ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
+              paddingTop +
+              cyPosLast
+            : ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
+              paddingTop;
         const onPress = () => {
           if (!onDataPointClick) {
             return;
           }
-
           onDataPointClick({
             index: i,
             value: x.toString(),
             dataset,
             getColor: opacity => this.getColor(dataset, opacity),
             label: labels[i],
+            cx: cx
           });
         };
-
-        const circlePoint = x.toString() + '+' + labels[i];
-
+        const circlePoint = x.toString() + "+" + labels[i];
         output.push(
           <Circle
             key={Math.random()}
@@ -107,11 +121,11 @@ class LineChart extends AbstractChart {
             cy={cy}
             r={dotR}
             strokeWidth={dotStrokeWidth}
-            fill={circlePoint === clickedPoint ? dotFillColor : 'transparent'}
+            fill={circlePoint === clickedPoint ? dotFillColor : "transparent"}
             stroke={
               circlePoint === clickedPoint
                 ? this.getColor(dataset, 0.9)
-                : 'transparent'
+                : "transparent"
             }
             onPress={onPress}
           />,
@@ -119,23 +133,21 @@ class LineChart extends AbstractChart {
             key={Math.random()}
             cx={cx}
             cy={cy}
-            r="12"
-            fill="#fff"
+            r='12'
+            fill='#fff'
             fillOpacity={0}
             onPress={onPress}
-          />,
+          />
         );
       });
     });
     return output;
   };
-
   renderShadow = config => {
     if (this.props.bezier) {
       return this.renderBezierShadow(config);
     }
-
-    const {data, width, height, paddingRight, paddingTop} = config;
+    const { data, width, height, paddingRight, paddingTop } = config;
     const output = [];
     const datas = this.getDatas(data);
     const baseHeight = this.calcBaseHeight(datas, height);
@@ -154,26 +166,24 @@ class LineChart extends AbstractChart {
                   paddingTop;
                 return `${x},${y}`;
               })
-              .join(' ') +
+              .join(" ") +
             ` ${paddingRight +
               ((width - paddingRight) / dataset.data.length) *
                 (dataset.data.length - 1)},${(height / 4) * 3 +
               paddingTop} ${paddingRight},${(height / 4) * 3 + paddingTop}`
           }
-          fill="url(#fillShadowGradient)"
+          fill='url(#fillShadowGradient)'
           strokeWidth={0}
-        />,
+        />
       );
     });
     return output;
   };
-
   renderLine = config => {
     if (this.props.bezier) {
       return this.renderBezierLine(config);
     }
-
-    const {width, height, paddingRight, paddingTop, data} = config;
+    const { width, height, paddingRight, paddingTop, data } = config;
     const output = [];
     const datas = this.getDatas(data);
     const baseHeight = this.calcBaseHeight(datas, height);
@@ -186,38 +196,33 @@ class LineChart extends AbstractChart {
           paddingTop;
         return `${x},${y}`;
       });
-
       output.push(
         <Polyline
           key={index}
-          points={points.join(' ')}
-          fill="none"
+          points={points.join(" ")}
+          fill='none'
           stroke={this.getColor(dataset, 0.2)}
           strokeWidth={this.getStrokeWidth(dataset)}
-        />,
+        />
       );
     });
-
     return output;
   };
-
   getBezierLinePoints = (dataset, config) => {
-    const {width, height, paddingRight, paddingTop, data} = config;
+    const { width, height, paddingRight, paddingTop, data } = config;
     if (dataset.data.length === 0) {
-      return 'M0,0';
+      return "M0,0";
     }
-
     const datas = this.getDatas(data);
     const x = i =>
       Math.floor(
-        paddingRight + (i * (width - paddingRight)) / (dataset.data.length - 1),
+        paddingRight + (i * (width - paddingRight)) / (dataset.data.length - 1)
       );
     const baseHeight = this.calcBaseHeight(datas, height);
     const y = i => {
       const yHeight = this.calcHeight(dataset.data[i], datas, height);
       return Math.floor(((baseHeight - yHeight) / 4) * 3 + paddingTop);
     };
-
     return [`M${x(0)},${y(0)}`]
       .concat(
         dataset.data.slice(0, -1).map((_, i) => {
@@ -229,11 +234,10 @@ class LineChart extends AbstractChart {
             `Q ${cp_x1}, ${y(i)}, ${x_mid}, ${y_mid}` +
             ` Q ${cp_x2}, ${y(i + 1)}, ${x(i + 1)}, ${y(i + 1)}`
           );
-        }),
+        })
       )
-      .join(' ');
+      .join(" ");
   };
-
   renderBezierLine = config => {
     const output = [];
     config.data.map((dataset, index) => {
@@ -242,17 +246,16 @@ class LineChart extends AbstractChart {
         <Path
           key={index}
           d={result}
-          fill="none"
+          fill='none'
           stroke={this.getColor(dataset, 0.2)}
           strokeWidth={this.getStrokeWidth(dataset)}
-        />,
+        />
       );
     });
     return output;
   };
-
   renderBezierShadow = config => {
-    const {width, height, paddingRight, paddingTop, data} = config;
+    const { width, height, paddingRight, paddingTop, data } = config;
     const output = [];
     data[0].data.length !== 0 &&
       data.map((dataset, index) => {
@@ -266,14 +269,13 @@ class LineChart extends AbstractChart {
           <Path
             key={index}
             d={d}
-            fill="url(#fillShadowGradient)"
+            fill='url(#fillShadowGradient)'
             strokeWidth={0}
-          />,
+          />
         );
       });
     return output;
   };
-
   render() {
     const paddingTop = 16;
     const paddingRight = 0;
@@ -291,30 +293,30 @@ class LineChart extends AbstractChart {
       style = {},
       decorator,
       onDataPointClick,
-      clickedPoint,
+      clickedPoint
     } = this.props;
-    const {labels = []} = data;
-    const {borderRadius = 0} = style;
+    const { labels = [] } = data;
+    const { borderRadius = 0 } = style;
     const config = {
       width,
-      height,
+      height
     };
     const datas = this.getDatas(data.datasets);
-    const {transparent} = this.props;
+    const { transparent } = this.props;
     return (
       <View style={style}>
         <Svg height={height} width={width}>
           <G>
             {this.renderDefs({
               ...config,
-              ...this.props.chartConfig,
+              ...this.props.chartConfig
             })}
             <Rect
-              width="100%"
+              width='100%'
               height={height}
               rx={borderRadius}
               ry={borderRadius}
-              fill={transparent ? 'none' : 'url(#backgroundGradient)'}
+              fill={transparent ? "none" : "url(#backgroundGradient)"}
             />
             <G>
               {withInnerLines || withHorizontalInnerLines
@@ -322,13 +324,13 @@ class LineChart extends AbstractChart {
                     ...config,
                     count: 4,
                     paddingTop,
-                    paddingRight,
+                    paddingRight
                   })
                 : withOuterLines
                 ? this.renderHorizontalLine({
                     ...config,
                     paddingTop,
-                    paddingRight,
+                    paddingRight
                   })
                 : null}
             </G>
@@ -339,7 +341,7 @@ class LineChart extends AbstractChart {
                     count: Math.min(...datas) === Math.max(...datas) ? 1 : 4,
                     data: datas,
                     paddingTop,
-                    paddingRight,
+                    paddingRight
                   })
                 : null}
             </G>
@@ -350,13 +352,13 @@ class LineChart extends AbstractChart {
                     data: data.datasets[0].data,
                     paddingTop,
                     paddingRight,
-                    labels: labels,
+                    labels: labels
                   })
                 : withOuterLines
                 ? this.renderVerticalLine({
                     ...config,
                     paddingTop,
-                    paddingRight,
+                    paddingRight
                   })
                 : null}
             </G>
@@ -366,7 +368,7 @@ class LineChart extends AbstractChart {
                     ...config,
                     labels,
                     paddingRight,
-                    paddingTop,
+                    paddingTop
                   })
                 : null}
             </G>
@@ -375,7 +377,7 @@ class LineChart extends AbstractChart {
                 ...config,
                 paddingRight,
                 paddingTop,
-                data: data.datasets,
+                data: data.datasets
               })}
             </G>
             <G>
@@ -384,10 +386,9 @@ class LineChart extends AbstractChart {
                   ...config,
                   data: data.datasets,
                   paddingRight,
-                  paddingTop,
+                  paddingTop
                 })}
             </G>
-
             <G>
               {withDots &&
                 this.renderDots({
@@ -396,7 +397,7 @@ class LineChart extends AbstractChart {
                   labels: labels,
                   paddingTop,
                   paddingRight,
-                  onDataPointClick,
+                  onDataPointClick
                 })}
             </G>
             <G>
@@ -405,24 +406,24 @@ class LineChart extends AbstractChart {
                   ...config,
                   data: data.datasets,
                   paddingTop,
-                  paddingRight,
+                  paddingRight
                 })}
             </G>
-            <G>
-              {clickedPoint &&
-                this.renderTooltipElement({
+            {clickedPoint && (
+              <G>
+                {this.renderTooltipElement({
                   ...config,
                   data: data.datasets,
                   labels: labels,
                   paddingTop,
-                  paddingRight,
+                  paddingRight
                 })}
-            </G>
+              </G>
+            )}
           </G>
         </Svg>
       </View>
     );
   }
 }
-
 export default LineChart;
