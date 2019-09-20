@@ -266,12 +266,16 @@ class LineChart extends AbstractChart {
               dataset.data.length},${(height / 4) * 3 +
             paddingTop} L${paddingRight},${(height / 4) * 3 + paddingTop} Z`;
         output.push(
-          <Path
-            key={index}
-            d={d}
-            fill='url(#fillShadowGradient)'
-            strokeWidth={0}
-          />
+          index === 0 ? (
+            <Path
+              key={index}
+              d={d}
+              fill='url(#fillShadowGradient)'
+              strokeWidth={0}
+            />
+          ) : (
+            <Path key={index} d={d} fill='transparent' strokeWidth={0} />
+          )
         );
       });
     return output;
