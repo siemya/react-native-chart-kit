@@ -13,28 +13,24 @@ class LineChart extends AbstractChart {
   }
   getDatas = data =>
     data.reduce((acc, item) => (item.data ? [...acc, ...item.data] : acc), [])
-
   calculateLine(maxPrice, minPrice, price, minCy) {
     if (result !== Infinity) return result
     return 0
   }
-
   renderPriceTool = config => {
     const { data, height, paddingTop, priceData, priceConfig } = config
-
     const output = []
     const datas = this.getDatas(data)
     const baseHeight = this.calcBaseHeight(datas, height)
     let maxCy = 0
-    let minCy = 99999999
-
+    let minCy = 99999999999
     data[0].data.forEach((x, i) => {
       const cy =
         ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 + paddingTop
       if (cy < minCy) minCy = cy
       if (cy > maxCy) maxCy = cy
     })
-
+    
     priceData.map((item, i) => {
      if(item.price && priceConfig.maxPrice>=item.price && priceConfig.minPrice<=item.price) {
         const yLine = (item.price * minCy) / priceConfig.maxPrice
@@ -42,8 +38,8 @@ class LineChart extends AbstractChart {
           item.status === 1
             ? "#14C91B"
             : item.status === 2
-            ? "#FEB932"
-            : "#F6392D"
+            ? "#F6392D"
+            : "#FEB932"
         output.push (
           <View
             key={i}
@@ -96,7 +92,6 @@ class LineChart extends AbstractChart {
     })
     return output
   }
-
   renderTooltipElement(config) {
     const { clickedPoint, dotR } = this.props
     const { data, width, height, paddingTop, paddingRight, labels } = config
@@ -117,7 +112,6 @@ class LineChart extends AbstractChart {
         const cy =
           ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
           paddingTop
-
         if (x.toString() + "+" + labels[i] === clickedPoint)
           output.push(
             <View
