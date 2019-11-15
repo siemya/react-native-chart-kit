@@ -13,85 +13,6 @@ class LineChart extends AbstractChart {
   }
   getDatas = data =>
     data.reduce((acc, item) => (item.data ? [...acc, ...item.data] : acc), [])
-  calculateLine(maxPrice, minPrice, price, minCy) {
-    if (result !== Infinity) return result
-    return 0
-  }
-  renderPriceTool = config => {
-    const { data, height, paddingTop, priceData, priceConfig } = config
-    const output = []
-    const datas = this.getDatas(data)
-    const baseHeight = this.calcBaseHeight(datas, height)
-    let maxCy = 0
-    let minCy = 99999999999
-    data[0].data.forEach((x, i) => {
-      const cy =
-        ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 + paddingTop
-      if (cy < minCy) minCy = cy
-      if (cy > maxCy) maxCy = cy
-    })
-    
-    priceData.map((item, i) => {
-     if(item.price && priceConfig.maxPrice>=item.price && priceConfig.minPrice<=item.price) {
-        const yLine = (item.price * minCy) / priceConfig.maxPrice
-        const color =
-          item.status === 1
-            ? "#14C91B"
-            : item.status === 2
-            ? "#F6392D"
-            : "#FEB932"
-        output.push (
-          <View
-            key={i}
-            style={{
-              position: "absolute",
-              left: 16,
-              top: yLine,
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              zIndex: 99999
-            }}
-          >
-            <View
-              style={{
-                width: 30,
-                height: 20,
-                borderRadius: 4,
-                backgroundColor: color,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Text style={{ color: "white", fontSize: 7, width: 22 }}>
-                {item.price}
-              </Text>
-              <View
-                style={{
-                  width: 7,
-                  height: 7,
-                  backgroundColor: color,
-                  position: "absolute",
-                  top: 7,
-                  right: -2,
-                  transform: [{ rotate: "45deg" }]
-                }}
-              />
-            </View>
-            <View
-              style={{
-                width: "90%",
-                height: 1,
-                backgroundColor: color
-              }}
-            />
-          </View>
-        )
-      }
-    })
-    return output
-  }
   renderTooltipElement(config) {
     const { clickedPoint, dotR } = this.props
     const { data, width, height, paddingTop, paddingRight, labels } = config
@@ -369,8 +290,6 @@ class LineChart extends AbstractChart {
       decorator,
       onDataPointClick,
       clickedPoint,
-      priceData,
-      priceConfig,
       paddingTop = 16
     } = this.props
     const { labels = [] } = data
@@ -500,16 +419,6 @@ class LineChart extends AbstractChart {
             )}
           </G>
         </Svg>
-        {!_.isEmpty(priceData) &&
-          this.renderPriceTool({
-            ...config,
-            data: data.datasets,
-            labels: labels,
-            paddingTop,
-            paddingRight,
-            priceConfig,
-            priceData
-          })}
       </View>
     )
   }
