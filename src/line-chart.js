@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from "react-native"
 import { Svg, Circle, Polygon, Polyline, Path, Rect, G } from "react-native-svg"
 import AbstractChart from "./abstract-chart"
 import _ from "lodash"
-
 class LineChart extends AbstractChart {
   getColor = (dataset, opacity) => {
     return (dataset.color || this.props.chartConfig.color)(opacity)
@@ -66,10 +65,14 @@ class LineChart extends AbstractChart {
     const baseHeight = this.calcBaseHeight(datas, height)
     data.map((dataset, index) => {
       dataset.data.map((x, i) => {
-        const cyPosFirst =
-          dataset.data.length !== 0 && x < dataset.data[i + 1]
-            ? 0 - dotR / 2
-            : dotR
+        let cyPosFirst =dotR
+        if(dataset.data[0].length >=2){
+          if(x < dataset.data[i + 1])
+          {
+            cyPosFirst=0 - dotR / 2
+          }
+        }
+            
         const cyPosLast = -dotR / 2
         const cx =
           i === 0
@@ -233,24 +236,26 @@ class LineChart extends AbstractChart {
   }
   renderBezierLine = config => {
     const output = []
-    config.data.map((dataset, index) => {
-      const result = this.getBezierLinePoints(dataset, config)
-      output.push(
-        <Path
-          key={index}
-          d={result}
-          fill="none"
-          stroke={this.getColor(dataset, 0.2)}
-          strokeWidth={this.getStrokeWidth(dataset)}
-        />
-      )
-    })
+    const {data } = config
+    data[0].data.length >= 2 &&
+      config.data.map((dataset, index) => {
+        const result = this.getBezierLinePoints(dataset, config)
+        output.push(
+          <Path
+            key={index}
+            d={result}
+            fill="none"
+            stroke={this.getColor(dataset, 0.2)}
+            strokeWidth={this.getStrokeWidth(dataset)}
+          />
+        )
+      })
     return output
   }
   renderBezierShadow = config => {
     const { width, height, paddingRight, paddingTop, data } = config
     const output = []
-    data[0].data.length !== 0 &&
+    data[0].data.length >= 2 &&
       data.map((dataset, index) => {
         const d =
           this.getBezierLinePoints(dataset, config) +
