@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native"
 import { Svg, Circle, Polygon, Polyline, Path, Rect, G } from "react-native-svg"
 import AbstractChart from "./abstract-chart"
 import _ from "lodash"
+​
 class LineChart extends AbstractChart {
   getColor = (dataset, opacity) => {
     return (dataset.color || this.props.chartConfig.color)(opacity)
@@ -64,78 +65,79 @@ class LineChart extends AbstractChart {
     const datas = this.getDatas(data)
     const baseHeight = this.calcBaseHeight(datas, height)
     data.map((dataset, index) => {
-      dataset.data.map((x, i) => {
-        let cyPosFirst =dotR
-        if(dataset.data[0].length >=2){
-          if(x < dataset.data[i + 1])
-          {
-            cyPosFirst=0 - dotR / 2
-          }
-        }
-            
-        const cyPosLast = -dotR / 2
-        const cx =
-          i === 0
-            ? paddingRight +
-              dotR +
-              (i * (width - paddingRight)) / (dataset.data.length - 1)
-            : i === dataset.data.length - 1
-            ? paddingRight -
-              dotR / 2 +
-              (i * (width - paddingRight)) / (dataset.data.length - 1)
-            : paddingRight +
-              (i * (width - paddingRight)) / (dataset.data.length - 1)
-        const cy =
-          i === 0
-            ? ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
-              paddingTop +
-              cyPosFirst
-            : i === dataset.data.length - 1
-            ? ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
-              paddingTop +
-              cyPosLast
-            : ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
-              paddingTop
-        const onPress = () => {
-          if (!onDataPointClick) {
-            return
-          }
-          onDataPointClick({
-            index: i,
-            value: x.toString(),
-            dataset,
-            getColor: opacity => this.getColor(dataset, opacity),
-            label: labels[i],
-            cx: cx
-          })
-        }
-        const circlePoint = x.toString() + "+" + labels[i]
-        output.push(
-          <Circle
-            key={Math.random()}
-            cx={cx}
-            cy={cy}
-            r={dotR}
-            strokeWidth={dotStrokeWidth}
-            fill={circlePoint === clickedPoint ? dotFillColor : "transparent"}
-            stroke={
-              circlePoint === clickedPoint
-                ? this.getColor(dataset, 0.9)
-                : "transparent"
+      dataset.data.length>=2 && 
+        dataset.data.map((x, i) => {
+          let cyPosFirst =dotR
+          if(dataset.data[0].length >=2){
+            if(x < dataset.data[i + 1])
+            {
+              cyPosFirst=0 - dotR / 2
             }
-            onPress={onPress}
-          />,
-          <Circle
-            key={Math.random()}
-            cx={cx}
-            cy={cy}
-            r="12"
-            fill="#fff"
-            fillOpacity={0}
-            onPress={onPress}
-          />
-        )
-      })
+          }
+              
+          const cyPosLast = -dotR / 2
+          const cx =
+            i === 0
+              ? paddingRight +
+                dotR +
+                (i * (width - paddingRight)) / (dataset.data.length - 1)
+              : i === dataset.data.length - 1
+              ? paddingRight -
+                dotR / 2 +
+                (i * (width - paddingRight)) / (dataset.data.length - 1)
+              : paddingRight +
+                (i * (width - paddingRight)) / (dataset.data.length - 1)
+          const cy =
+            i === 0
+              ? ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
+                paddingTop +
+                cyPosFirst
+              : i === dataset.data.length - 1
+              ? ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
+                paddingTop +
+                cyPosLast
+              : ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
+                paddingTop
+          const onPress = () => {
+            if (!onDataPointClick) {
+              return
+            }
+            onDataPointClick({
+              index: i,
+              value: x.toString(),
+              dataset,
+              getColor: opacity => this.getColor(dataset, opacity),
+              label: labels[i],
+              cx: cx
+            })
+          }
+          const circlePoint = x.toString() + "+" + labels[i]
+          output.push(
+            <Circle
+              key={Math.random()}
+              cx={cx}
+              cy={cy}
+              r={dotR}
+              strokeWidth={dotStrokeWidth}
+              fill={circlePoint === clickedPoint ? dotFillColor : "transparent"}
+              stroke={
+                circlePoint === clickedPoint
+                  ? this.getColor(dataset, 0.9)
+                  : "transparent"
+              }
+              onPress={onPress}
+            />,
+            <Circle
+              key={Math.random()}
+              cx={cx}
+              cy={cy}
+              r="12"
+              fill="#fff"
+              fillOpacity={0}
+              onPress={onPress}
+            />
+          )
+        })
     })
     return output
   }
