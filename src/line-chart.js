@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native"
 import { Svg, Circle, Polygon, Polyline, Path, Rect, G } from "react-native-svg"
 import AbstractChart from "./abstract-chart"
 import _ from "lodash"
-​
+
 class LineChart extends AbstractChart {
   getColor = (dataset, opacity) => {
     return (dataset.color || this.props.chartConfig.color)(opacity)
