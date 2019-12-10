@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { LinearGradient, Line, Text, Defs, Stop } from "react-native-svg";
 import * as math from 'mathjs'
+
 class AbstractChart extends Component {
   calcScaler = data => {
     if (this.props.fromZero) {
@@ -225,4 +226,5 @@ class AbstractChart extends Component {
     );
   };
 }
+
 export default AbstractChart;
