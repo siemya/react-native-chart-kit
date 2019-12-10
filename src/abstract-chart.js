@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { LinearGradient, Line, Text, Defs, Stop } from "react-native-svg";
-
+import * as math from 'mathjs'
 class AbstractChart extends Component {
   calcScaler = data => {
     if (this.props.fromZero) {
@@ -86,14 +86,16 @@ class AbstractChart extends Component {
     return [...new Array(count)].map((_, i) => {
       let yLabel;
       if (count === 1) {
-        yLabel = `${yAxisLabel}${parseFloat(data[0].toFixed(decimalPlaces))}`;
+        yLabel = `${yAxisLabel}${parseFloat(data[0])}`;
       } else {
         const label = this.props.fromZero
           ? (this.calcScaler(data) / (count - 1)) * i + Math.min(...data, 0)
           : (this.calcScaler(data) / (count - 1)) * i + Math.min(...data);
-        yLabel = `${yAxisLabel}${parseFloat(label.toFixed(decimalPlaces))}`;
+        yLabel = `${yAxisLabel}${parseFloat(label)}`;
       }
-      yLabel = yLabel === "NaN" ? 0 : yLabel;
+      yLabel = yLabel === "NaN" ? 0 : parseFloat(yLabel);
+      yLabel = math.format(yLabel, { notation: "fixed" }).substring(0, decimalPlaces)
+      yLabel = yLabel.slice(-1) === "." ? yLabel.substring(0, decimalPlaces - 1) : yLabel
       return (
         <Text
           key={Math.random()}
@@ -223,5 +225,4 @@ class AbstractChart extends Component {
     );
   };
 }
-
 export default AbstractChart;
