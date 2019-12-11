@@ -1,10 +1,14 @@
 import React from "react"
-import { View, Text, StyleSheet } from "react-native"
+import { View} from "react-native"
 import { Svg, Circle, Polygon, Polyline, Path, Rect, G } from "react-native-svg"
 import AbstractChart from "./abstract-chart"
 import _ from "lodash"
 
 class LineChart extends AbstractChart {
+  shouldComponentUpdate(nextProps) {
+    return !_.isEqual(this.props.data, nextProps.data) 
+  }
+  
   getColor = (dataset, opacity) => {
     return (dataset.color || this.props.chartConfig.color)(opacity)
   }
@@ -13,42 +17,42 @@ class LineChart extends AbstractChart {
   }
   getDatas = data =>
     data.reduce((acc, item) => (item.data ? [...acc, ...item.data] : acc), [])
-  renderTooltipElement(config) {
-    const { clickedPoint, dotR } = this.props
-    const { data, width, height, paddingTop, paddingRight, labels } = config
-    const output = []
-    const datas = this.getDatas(data)
-    const baseHeight = this.calcBaseHeight(datas, height)
-    data.map((dataset, index) => {
-      dataset.data.map((x, i) => {
-        const cx =
-          i === 0
-            ? paddingRight +
-              (i * (width - paddingRight)) / (dataset.data.length - 1)
-            : i === dataset.data.length - 1
-            ? paddingRight +
-              (i * (width - paddingRight)) / (dataset.data.length - 1)
-            : paddingRight +
-              (i * (width - paddingRight)) / (dataset.data.length - 1)
-        const cy =
-          ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
-          paddingTop
-        if (x.toString() + "+" + labels[i] === clickedPoint)
-          output.push(
-            <View
-              key={i}
-              style={{
-                marginTop: cy,
-                marginLeft: dataset.data.length - 1 === i ? cx - 3 : cx
-              }}
-            >
-              {this.props.tooltip}
-            </View>
-          )
-      })
-    })
-    return output
-  }
+  // renderTooltipElement(config) {
+  //   const { clickedPoint, dotR } = this.props
+  //   const { data, width, height, paddingTop, paddingRight, labels } = config
+  //   const output = []
+  //   const datas = this.getDatas(data)
+  //   const baseHeight = this.calcBaseHeight(datas, height)
+  //   data.map((dataset, index) => {
+  //     dataset.data.map((x, i) => {
+  //       const cx =
+  //         i === 0
+  //           ? paddingRight +
+  //             (i * (width - paddingRight)) / (dataset.data.length - 1)
+  //           : i === dataset.data.length - 1
+  //           ? paddingRight +
+  //             (i * (width - paddingRight)) / (dataset.data.length - 1)
+  //           : paddingRight +
+  //             (i * (width - paddingRight)) / (dataset.data.length - 1)
+  //       const cy =
+  //         ((baseHeight - this.calcHeight(x, datas, height)) / 4) * 3 +
+  //         paddingTop
+  //       if (x.toString() + "+" + labels[i] === clickedPoint)
+  //         output.push(
+  //           <View
+  //             key={i}
+  //             style={{
+  //               marginTop: cy,
+  //               marginLeft: dataset.data.length - 1 === i ? cx - 3 : cx
+  //             }}
+  //           >
+  //             {this.props.tooltip}
+  //           </View>
+  //         )
+  //     })
+  //   })
+  //   return output
+  // }
   renderDots = config => {
     const {
       data,
@@ -108,7 +112,8 @@ class LineChart extends AbstractChart {
               dataset,
               getColor: opacity => this.getColor(dataset, opacity),
               label: labels[i],
-              cx: cx
+              cx: cx,
+              cy: cy
             })
           }
           const circlePoint = x.toString() + "+" + labels[i]
@@ -119,12 +124,8 @@ class LineChart extends AbstractChart {
               cy={cy}
               r={dotR}
               strokeWidth={dotStrokeWidth}
-              fill={circlePoint === clickedPoint ? dotFillColor : "transparent"}
-              stroke={
-                circlePoint === clickedPoint
-                  ? this.getColor(dataset, 0.9)
-                  : "transparent"
-              }
+              fill={ "transparent"}
+              stroke={ "transparent"}
               onPress={onPress}
             />,
             <Circle
@@ -296,7 +297,6 @@ class LineChart extends AbstractChart {
       style = {},
       decorator,
       onDataPointClick,
-      clickedPoint,
       paddingTop = 16
     } = this.props
     const { labels = [] } = data
@@ -413,21 +413,11 @@ class LineChart extends AbstractChart {
                   paddingRight
                 })}
             </G>
-            {clickedPoint && (
-              <G>
-                {this.renderTooltipElement({
-                  ...config,
-                  data: data.datasets,
-                  labels: labels,
-                  paddingTop,
-                  paddingRight
-                })}
-              </G>
-            )}
           </G>
         </Svg>
       </View>
     )
   }
 }
+
 export default LineChart
