@@ -71,6 +71,7 @@ class LineChart extends AbstractChart {
     data.map((dataset, index) => {
       dataset.data.length>=2 && 
         dataset.data.map((x, i) => {
+          if(index===1) return false
           let cyPosFirst =dotR
           if(dataset.data[0].length >=2){
             if(x < dataset.data[i + 1])
